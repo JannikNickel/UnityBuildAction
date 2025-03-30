@@ -45,9 +45,13 @@ runs:
         INPUT_PLATFORM: ${{ inputs.PLATFORM }}
         INPUT_EXECUTE_METHOD: ${{ inputs.EXECUTE_METHOD }}
         INPUT_IL2CPP: ${{ inputs.IL2CPP }}
-      run: python ./UnityBuildAction/build.py
+      run: python ./UnityBuildAction/builder/build.py
       shell: cmd
 
     - name: Cleanup
       run: rmdir ./UnityBuildAction /s /q
+      shell: cmd
+
+    - name: Shutdown
+      run: shutdown /s /t 5
       shell: cmd

@@ -1,0 +1,31 @@
+name: "Init Unity Build Runner"
+description: "Resets and starts the windows runner for the Unity Build Action"
+
+inputs:
+  bootstrapper_path:
+    description: "Path on the self hosted runner where the .env file and lock files are located / stored"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        repository: "JannikNickel/UnityBuildAction"
+        path: "./UnityBuildAction"
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+
+    - name: Init Unity Runner
+      env:
+        INPUT_BOOTSTRAPPER_PATH: ${{ inputs.BOOTSTRAPPER_PATH }}
+      run: python ./UnityBuildAction/bootstrapper/start.py
+      shell: bash
+
+    - name: Cleanup
+      run: rm -rf ./UnityBuildAction
+      shell: bash
