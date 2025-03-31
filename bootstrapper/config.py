@@ -10,7 +10,7 @@ API_USER = None
 API_TOKEN = None
 
 def initialize(dotenv_path = None):
-    load_dotenv(dotenv_path)
+    load_dotenv(dotenv_path, override = True)
 
     global PROXMOX_HOST, NODE, RUNNER_VMID, BACKUP_STORAGE, RUNNER_BACKUP, API_USER, API_TOKEN
     PROXMOX_HOST = os.getenv("PVE_PROXMOX_HOST")

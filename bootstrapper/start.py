@@ -1,8 +1,8 @@
 import os
 import config
 
-BOOTSTRAPPER_PATH = os.path.abspath(os.path.join(os.getcwd(), os.getenv("INPUT_BOOTSTRAPPER_PATH")))
-config.initialize(BOOTSTRAPPER_PATH)
+BOOTSTRAPPER_PATH_VAR = os.getenv("INPUT_BOOTSTRAPPER_PATH")
+BOOTSTRAPPER_PATH = os.path.abspath(os.path.join(os.getcwd(), BOOTSTRAPPER_PATH_VAR, ".env"))
 
 import proxmox_vm
 
