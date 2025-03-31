@@ -2,6 +2,7 @@ import time
 import fcntl
 import atexit
 import signal
+from log import *
 
 class LockFile:
     def __init__(self, path, timeout = None, wait_interval = 1):
@@ -25,7 +26,7 @@ class LockFile:
                 if self.timeout and (time.time() - start_time) >= self.timeout:
                     raise TimeoutError(f"[LockFile] Timeout while waiting to acquire lock on {self.path}")
 
-                print(f"[LockFile] Waiting for lock: {self.path}")
+                log("LockFile", f"Waiting for lock: {self.path}")
                 time.sleep(self.wait_interval)
 
         atexit.register(self.release)
@@ -38,9 +39,9 @@ class LockFile:
                 fcntl.flock(self.file.fileno(), fcntl.LOCK_UN)
                 self.file.close()
                 self.file = None
-                print(f"[LockFile] Released lock: {self.path}")
+                log("LockFile", f"Released lock: {self.path}")
         except Exception as e:
-            print(f"[LockFile] Error releasing lock: {e}")
+            log("LockFile", f"Error releasing lock: {e}")
 
     def __enter__(self):
         self.acquire()

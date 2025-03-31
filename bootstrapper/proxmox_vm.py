@@ -3,6 +3,7 @@
 
 import requests
 import time
+from log import *
 from config import PROXMOX_HOST, NODE, API_USER, API_TOKEN
 
 HEADERS = {
@@ -25,17 +26,17 @@ def get_vm_status(vmid):
 
 def start_vm(vmid):
     post(f"{PROXMOX_HOST}/api2/json/nodes/{NODE}/qemu/{vmid}/status/start")
-    print(f"VM {vmid} start requested")
+    log("PVE", f"VM {vmid} start requested")
 
 def stop_vm(vmid):
     post(f"{PROXMOX_HOST}/api2/json/nodes/{NODE}/qemu/{vmid}/status/stop")
-    print(f"VM {vmid} stop requested")
+    log("PVE", f"VM {vmid} stop requested")
 
 def wait_vm_status(vmid, desired_status, interval = 5):
-    print(f"Waiting for VM {vmid} to be in \"{desired_status}\" state...")
+    log("PVE", f"Waiting for VM {vmid} to be in \"{desired_status}\" state...")
     while True:
         status = get_vm_status(vmid)
-        print(f"  Current status: {status}")
+        log("PVE", f"Current status: {status}")
         if status == desired_status:
             break
         time.sleep(interval)
@@ -60,18 +61,18 @@ def wait_for_task_completion(upid, interval = 5, timeout = 900):
         if status == "stopped":
             exitstatus = status_resp["data"]["exitstatus"]
             if exitstatus == "OK":
-                print("Restore completed successfully.")
+                log("PVE", "Restore completed successfully.")
                 return
             else:
                 raise Exception(f"Restore failed: {exitstatus}")
-        print(f"  Current status: {status}")
+        log("PVE", f"Current status: {status}")
         time.sleep(interval)
 
 def restore_vm_backup_by_filename(vmid, backup_storage, file):
     restore_vm_backup(vmid, f"{backup_storage}:backup/{file}")
 
 def restore_vm_backup(vmid, volid):
-    print(f"Restoring backup {volid} to VM {vmid}...")
+    log("PVE", f"Restoring backup {volid} to VM {vmid}...")
     url = f"{PROXMOX_HOST}/api2/json/nodes/{NODE}/qemu"
     resp = post(url, data = {
         "vmid": vmid,
@@ -79,6 +80,6 @@ def restore_vm_backup(vmid, volid):
         "force": 1,
         "unique": 0
     })
-
-    print("Restore started. Waiting for a completion...")
+    
+    log("PVE", f"Restore started. Waiting for a completion...")
     wait_for_task_completion(resp["data"])
