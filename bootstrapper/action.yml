@@ -20,6 +20,10 @@ runs:
       with:
         python-version: ">=3.12"
 
+    - name: Install Dependencies
+      run: pip install -r ./UnityBuildAction/bootstrapper/requirements.txt
+      shell: bash
+
     - name: Init Unity Runner
       env:
         INPUT_BOOTSTRAPPER_PATH: ${{ inputs.BOOTSTRAPPER_PATH }}
