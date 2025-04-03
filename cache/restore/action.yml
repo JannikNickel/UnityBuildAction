@@ -1,0 +1,57 @@
+name: "Cache Data"
+description: "Caches a folder on an S3-Server"
+
+inputs:
+  server:
+    description: "S3 server ip and port or address"
+    required: true
+  server_access_key:
+    description: "S3 server access key"
+    required: true
+  server_secret_key:
+    description: "S3 server secret"
+    required: true
+  server_bucket:
+    description: "S3 server bucket"
+    required: true
+  id:
+    description: "Identifier / prefix to use for the cached data"
+    required: true
+  path:
+    description: "Local path where the contents from the cache will be restored to"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        repository: "JannikNickel/UnityBuildAction"
+        path: "./UnityBuildAction"
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ">=3.12"
+
+    - name: Install Dependencies
+      run: pip install -r ./UnityBuildAction/requirements.txt
+      shell: cmd
+
+    - name: Init Unity Runner
+      env:
+        INPUT_SERVER: ${{ inputs.server }}
+        INPUT_SERVER_ACCESS_KEY: ${{ inputs.server_access_key }}
+        INPUT_SERVER_SECRET_KEY: ${{ inputs.server_secret_key }}
+        INPUT_SERVER_BUCKET: ${{ inputs.server_bucket }}
+        INPUT_ID: ${{ inputs.id }}
+        INPUT_PATH: ${{ inputs.path }}
+        INPUT_CLEAR_EXISTING: ${{ inputs.clear_existing }}
+        INPUT_ACTION: "restore"
+      run: python ./UnityBuildAction/cache/cache.py
+      shell: cmd
+
+    - name: Cleanup
+      run: rmdir ./UnityBuildAction /s /q
+      shell: cmd

@@ -21,7 +21,7 @@ runs:
         python-version: ">=3.12"
 
     - name: Install Dependencies
-      run: pip install -r ./UnityBuildAction/bootstrapper/requirements.txt
+      run: pip install -r ./UnityBuildAction/requirements.txt
       shell: bash
 
     - name: Init Unity Runner

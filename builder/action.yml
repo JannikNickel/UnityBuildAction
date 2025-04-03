@@ -37,6 +37,10 @@ runs:
       with:
         python-version: ">=3.12"
 
+    - name: Install Dependencies
+      run: pip install -r ./UnityBuildAction/requirements.txt
+      shell: bash
+
     - name: Build Project
       env:
         INPUT_UNITY_PATH_VAR: ${{ inputs.UNITY_PATH_VAR }}
