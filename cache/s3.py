@@ -41,9 +41,10 @@ class S3Client:
         for i in range(retries):
             try:
                 return operation()
-            except S3Error as e:
+            except Exception as e:
                 if i == retries - 1:
-                    raise
+                    log("S3", f"Operation failed after {retries} retries: {e}")
+                    return False
                 time.sleep(delay * (i + 1))
     
     def can_skip_file(self, bucket, object_name, local_path, hash, size):

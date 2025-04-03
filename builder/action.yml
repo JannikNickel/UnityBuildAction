@@ -39,7 +39,7 @@ runs:
 
     - name: Install Dependencies
       run: pip install -r ./UnityBuildAction/requirements.txt
-      shell: bash
+      shell: cmd
 
     - name: Build Project
       env:
@@ -53,9 +53,5 @@ runs:
       shell: cmd
 
     - name: Cleanup
-      run: rmdir ./UnityBuildAction /s /q
-      shell: cmd
-
-    - name: Shutdown
-      run: shutdown /s /t 5
+      run: rmdir UnityBuildAction /s /q
       shell: cmd

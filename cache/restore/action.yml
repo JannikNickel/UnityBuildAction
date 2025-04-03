@@ -53,5 +53,5 @@ runs:
       shell: cmd
 
     - name: Cleanup
-      run: rmdir ./UnityBuildAction /s /q
+      run: rmdir UnityBuildAction /s /q
       shell: cmd

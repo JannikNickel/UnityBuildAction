@@ -9,3 +9,5 @@ Contains another action and some scripts to reset and start up the windows runne
 ### `cache` & `cache/restore`
 Actions to cache and restore a folder to / from an S3 server. Unfortunately the default cache action doesnt support custom urls yet and some other solutions need binary patching which is a possible source for problems with updates:
 https://github.com/falcondev-oss/github-actions-cache-server
+
+Note: Path length limit on windows should be disabled to prevent download errors due to long temporary file names
