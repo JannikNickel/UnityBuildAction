@@ -9,6 +9,8 @@ BOOTSTRAPPER_PATH_VAR = os.getenv("INPUT_BOOTSTRAPPER_PATH")
 BOOTSTRAPPER_PATH = os.path.abspath(os.path.join(os.getcwd(), BOOTSTRAPPER_PATH_VAR))
 ENV_FILE_PATH = os.path.join(BOOTSTRAPPER_PATH, ".env")
 LOCK_FILE_PATH = os.path.join(BOOTSTRAPPER_PATH, ".lock")
+RESET_RUNNER = os.getenv("INPUT_RESET_RUNNER", "true").lower() == "true"
+
 log("BOOTSTRAPPER", f"Loading config: {ENV_FILE_PATH}")
 config.initialize(ENV_FILE_PATH)
 
@@ -21,8 +23,12 @@ try:
         proxmox_vm.wait_vm_status(config.RUNNER_VMID, "stopped")
 
         # Restore the VM from the latest backup to ensure a clean state
-        backup_volid = config.RUNNER_BACKUP or proxmox_vm.get_latest_backup_filename(config.RUNNER_VMID, config.BACKUP_STORAGE)
-        proxmox_vm.restore_vm_backup(config.RUNNER_VMID, backup_volid)
+        if RESET_RUNNER:
+            backup_volid = config.RUNNER_BACKUP or proxmox_vm.get_latest_backup_filename(config.RUNNER_VMID, config.BACKUP_STORAGE)
+            if backup_volid is None:
+                log("BOOTSTRAPPER", "No backup found, exiting...")
+                exit(1)
+            proxmox_vm.restore_vm_backup(config.RUNNER_VMID, backup_volid)
 
         # Start the VM
         proxmox_vm.start_vm(config.RUNNER_VMID)

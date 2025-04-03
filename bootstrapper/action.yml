@@ -5,6 +5,10 @@ inputs:
   bootstrapper_path:
     description: "Path on the self hosted runner where the .env file and lock files are located / stored"
     required: true
+  reset_runner:
+    description: "If true, the latest backup of the build VM will be restored to start with a clean state"
+    required: false
+    default: true
 
 runs:
   using: "composite"
@@ -27,6 +31,7 @@ runs:
     - name: Init Unity Runner
       env:
         INPUT_BOOTSTRAPPER_PATH: ${{ inputs.BOOTSTRAPPER_PATH }}
+        INPUT_RESET_RUNNER: ${{ inputs.RESET_RUNNER }}
       run: python ./UnityBuildAction/bootstrapper/start.py
       shell: bash
 
