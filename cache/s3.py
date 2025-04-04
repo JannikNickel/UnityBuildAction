@@ -81,6 +81,11 @@ class S3Client:
             for file in files:
                 full_path = self.normalize_path(root, file)
                 relative_path = os.path.relpath(full_path, local_dir)
+
+                # skip lock files in the lib folder
+                if relative_path.endswith("-lock"):
+                    continue
+
                 s3_key = f"{remote_prefix}{relative_path}"
                 all_files.append((full_path, s3_key))
 
