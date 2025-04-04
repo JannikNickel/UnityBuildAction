@@ -12,6 +12,7 @@ namespace JNI.Editor.CI
     {
         private const string targetArg = "target";
         private const string il2cppArg = "il2cpp";
+        private const string il2cppConfigArg = "il2cppCompilerConfiguration";
         private const string outputArg = "output";
 
         public static void Build()
@@ -26,7 +27,6 @@ namespace JNI.Editor.CI
                 {
                     string key = args[i].TrimStart('-');
                     string value = (i + 1 < args.Length && args[i + 1].StartsWith("-") == false) ? args[i + 1] : null;
-                    Log($"{i} -> {args[i]} = {value}");
                     parsedArgs[key] = value;
                 }
             }
@@ -53,6 +53,13 @@ namespace JNI.Editor.CI
 
             data.Target = target;
             data.IL2CPP = parsedArgs.TryGetValue(il2cppArg, out string il2cppString) && il2cppString?.ToLower() == "true";
+            data.IL2CPPConfig = parsedArgs.GetValueOrDefault(il2cppConfigArg, "").ToLower() switch
+            {
+                "master" => Il2CppCompilerConfiguration.Master,
+                "release" => Il2CppCompilerConfiguration.Release,
+                "debug" => Il2CppCompilerConfiguration.Debug,
+                _ => Il2CppCompilerConfiguration.Master
+            };
             data.OutputFolder = output;
             string fileName = $"{Application.productName.Replace(" ", "")}{GetExtension(target)}";
             Compile(data, fileName);
@@ -62,7 +69,7 @@ namespace JNI.Editor.CI
 
         private static void Compile(BuildData data, string fileName)
         {
-            Log($"Compile Params:\ntarget = {data.Target}\nil2cpp = {data.IL2CPP}\noutput = {data.OutputFolder}");
+            Log($"Compile Params:\ntarget = {data.Target}\nil2cpp = {data.IL2CPP}\nil2cpp config = {data.IL2CPPConfig}\noutput = {data.OutputFolder}");
 
             NamedBuildTarget namedTarget = NamedBuildTarget.Standalone;
             ScriptingImplementation prevBackend = UnityEditor.PlayerSettings.GetScriptingBackend(namedTarget);
@@ -76,6 +83,10 @@ namespace JNI.Editor.CI
                 bool il2cpp = data.IL2CPP && IL2CPPSupported(data.Target);
                 EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.Standalone, data.Target);
                 UnityEditor.PlayerSettings.SetScriptingBackend(namedTarget, il2cpp ? ScriptingImplementation.IL2CPP : ScriptingImplementation.Mono2x);
+                if(il2cpp)
+                {
+                    UnityEditor.PlayerSettings.SetIl2CppCompilerConfiguration(namedTarget, data.IL2CPPConfig);
+                }
                 string[] additionalDefines = new string[] { "STEAM_BUILD" };
 
                 //Temporary build directory
@@ -92,6 +103,7 @@ namespace JNI.Editor.CI
                 options.targetGroup = BuildPipeline.GetBuildTargetGroup(data.Target);
                 options.target = data.Target;
                 options.options = BuildOptions.None;
+                options.extraScriptingDefines = additionalDefines;
                 UnityEditor.Build.Reporting.BuildReport report = BuildPipeline.BuildPlayer(options);
                 Log($"Build completed with result {report.summary.result} in {report.summary.totalTime.Seconds}s");
                 if(report.summary.result != UnityEditor.Build.Reporting.BuildResult.Succeeded)
@@ -149,21 +161,13 @@ namespace JNI.Editor.CI
         };
 
         private static bool IL2CPPSupported(BuildTarget target)
-        {
-            return target == BuildTarget.StandaloneWindows64 || target == BuildTarget.StandaloneWindows || target == BuildTarget.StandaloneLinux64;
-        }
+            => target == BuildTarget.StandaloneWindows64 || target == BuildTarget.StandaloneWindows || target == BuildTarget.StandaloneLinux64;
 
         private static string[] GetScenePaths()
-        {
-            return EditorBuildSettings.scenes.Select(n => n.path).ToArray();
-        }
+            => EditorBuildSettings.scenes.Select(n => n.path).ToArray();
 
         private static void CopyDirContents(string sourceDirectory, string targetDirectory)
-        {
-            DirectoryInfo diSource = new DirectoryInfo(sourceDirectory);
-            DirectoryInfo diTarget = new DirectoryInfo(targetDirectory);
-            CopyAll(diSource, diTarget);
-        }
+            => CopyAll(new DirectoryInfo(sourceDirectory), new DirectoryInfo(targetDirectory));
 
         private static void CopyAll(DirectoryInfo source, DirectoryInfo target)
         {
@@ -180,15 +184,14 @@ namespace JNI.Editor.CI
         }
 
         private static void Log(string message)
-        {
-            Console.WriteLine($"[CIBuild] {message}");
-        }
+            => Console.WriteLine($"[CIBuild] {message}");
     }
 
     public class BuildData
     {
         public BuildTarget Target { get; set; }
         public bool IL2CPP { get; set; }
+        public Il2CppCompilerConfiguration IL2CPPConfig { get; set; }
         public string OutputFolder { get; set; }
     }
 }

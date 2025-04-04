@@ -9,12 +9,15 @@ OUTPUT_PATH = os.getenv("INPUT_OUTPUT_PATH")
 PLATFORM = os.getenv("INPUT_PLATFORM")
 EXECUTE_METHOD = os.getenv("INPUT_EXECUTE_METHOD", "JNI.Editor.CI.CIBuild.Build")
 IL2CPP = os.getenv("INPUT_IL2CPP", "false")
+IL2CPP_COMPILER_CONFIG = os.getenv("INPUT_IL2CPP_COMPILER_CONFIG", "master").lower()
 
 assert(UNITY_PATH_VAR)
 assert(UNITY_PATH)
 assert(PROJECT_PATH)
 assert(OUTPUT_PATH)
 assert(PLATFORM in ["StandaloneWindows64", "StandaloneWindows", "StandaloneLinux64"])
+if IL2CPP_COMPILER_CONFIG:
+    assert(IL2CPP_COMPILER_CONFIG in ["master", "release", "debug"])
 
 PROJECT_PATH = os.path.abspath(os.path.join(os.getcwd(), PROJECT_PATH))
 OUTPUT_PATH = os.path.abspath(os.path.join(os.getcwd(), OUTPUT_PATH))
@@ -30,6 +33,7 @@ args = [
     "-unityBuildTarget", PLATFORM,
     "-target", PLATFORM,
     "-il2cpp", IL2CPP,
+    "-il2cppCompilerConfiguration", IL2CPP_COMPILER_CONFIG,
     "-output", OUTPUT_PATH
 ]
 

@@ -22,6 +22,15 @@ inputs:
     description: "Whether to use IL2CPP for the build"
     required: false
     default: false
+  il2cpp_compiler_config:
+    description: "The IL2CPP compiler configuration to use. Can be one of: master, release, debug"
+    required: false
+    type: choice
+    options:
+      - master
+      - release
+      - debug
+    default: master
 
 runs:
   using: "composite"
@@ -49,6 +58,7 @@ runs:
         INPUT_PLATFORM: ${{ inputs.PLATFORM }}
         INPUT_EXECUTE_METHOD: ${{ inputs.EXECUTE_METHOD }}
         INPUT_IL2CPP: ${{ inputs.IL2CPP }}
+        INPUT_IL2CPP_COMPILER_CONFIG: ${{ inputs.IL2CPP_COMPILER_CONFIG }}
       run: python ./UnityBuildAction/builder/build.py
       shell: cmd
 
