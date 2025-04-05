@@ -32,6 +32,10 @@ def stop_vm(vmid):
     post(f"{PROXMOX_HOST}/api2/json/nodes/{NODE}/qemu/{vmid}/status/stop")
     log("PVE", f"VM {vmid} stop requested")
 
+def shutdown_vm(vmid):
+    post(f"{PROXMOX_HOST}/api2/json/nodes/{NODE}/qemu/{vmid}/status/shutdown")
+    log("PVE", f"VM {vmid} shutdown requested")
+
 def wait_vm_status(vmid, desired_status, interval = 5):
     log("PVE", f"Waiting for VM {vmid} to be in \"{desired_status}\" state...")
     while True:
