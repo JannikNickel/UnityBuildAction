@@ -30,9 +30,12 @@ runs:
   steps:
     - name: Checkout
       uses: actions/checkout@v4
+      env:
+        ACTION_REF: ${{ github.action_ref }}
       with:
         repository: "JannikNickel/UnityBuildAction"
         path: "./UnityBuildAction"
+        ref: ${{ env.ACTION_REF }}
 
     - name: Setup Python
       uses: actions/setup-python@v5

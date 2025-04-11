@@ -69,11 +69,6 @@ def main():
     if result != 0:
         raise RuntimeError(f"Failed to reset repository: {result}")
     
-    log("CHECKOUT", "Cleaning up untracked files")
-    result = run_subprocess_async(["git", "-C", PATH, "clean", "-fdx"])
-    if result != 0:
-        raise RuntimeError(f"Failed to clean repository: {result}")
-    
     log("CHECKOUT", "Fetch the reference")
     result = run_subprocess_async(["git", "-C", PATH, "fetch", "origin", REF])
     if result != 0:
