@@ -56,7 +56,7 @@ def main():
                     os.chmod(os.path.join(root, f), 0o777)
             shutil.rmtree(PATH)
         
-    access_url = f"https://{TOKEN}@github.com/{REPOSITORY}.git"
+    access_url = f"https://x-access-token:{TOKEN}@github.com/{REPOSITORY}.git"
     if not exists:
         log("CHECKOUT", "Cloning repository")
         result = run_subprocess_async(
@@ -74,6 +74,8 @@ def main():
     result = run_subprocess_async(["git", "-C", PATH, "remote", "set-url", "origin", access_url])
     if result != 0:
         raise RuntimeError(f"Failed to set origin to authorized url: {result}")
+    
+    log("CHECKOUT", f"{access_url}")
     
     log("CHECKOUT", "Fetch the reference")
     result = run_subprocess_async(["git", "-C", PATH, "fetch", "origin", REF])
