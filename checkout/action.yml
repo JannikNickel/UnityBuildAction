@@ -18,7 +18,7 @@ runs:
       with:
         repository: "JannikNickel/UnityBuildAction"
         path: "./UnityBuildAction"
-        ref: ${{ github.action_ref }}
+        ref: "development"
 
     - name: Setup Python
       uses: actions/setup-python@v5
