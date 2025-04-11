@@ -1,0 +1,45 @@
+name: "Checkout"
+description: "Checkout the repository and discard any unstaged changes"
+
+inputs:
+  token:
+    description: "The github token to access the repository"
+    required: true
+  path:
+    description: "The path to the repository"
+    required: false
+    default: ""
+
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      env:
+        ACTION_REF: ${{ github.action_ref }}
+      with:
+        repository: "JannikNickel/UnityBuildAction"
+        path: "./UnityBuildAction"
+        ref: ${{ env.ACTION_REF }}
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ">=3.12"
+
+    - name: Install Dependencies
+      run: pip install -r ./UnityBuildAction/requirements.txt
+      shell: cmd
+
+    - name: Checkout Repo
+      env:
+        INPUT_REPOSITORY: ${{ github.repository }}
+        INPUT_REF: ${{ github.ref }}
+        INPUT_TOKEN: ${{ inputs.token }}
+        INPUT_PATH: ${{ inputs.path }}
+      run: python ./UnityBuildAction/checkout/checkout.py
+      shell: cmd
+
+    - name: Cleanup
+      run: rmdir UnityBuildAction /s /q
+      shell: cmd
