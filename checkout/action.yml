@@ -9,6 +9,10 @@ inputs:
     description: "The path to the repository"
     required: false
     default: ""
+  lfs:
+    description: "Whether to use LFS or not"
+    required: false
+    default: false
 
 runs:
   using: "composite"
@@ -37,6 +41,7 @@ runs:
         INPUT_REF: ${{ github.ref }}
         INPUT_TOKEN: ${{ inputs.token }}
         INPUT_PATH: ${{ inputs.path }}
+        INPUT_LFS: ${{ inputs.lfs }}
       run: python ./UnityBuildAction/checkout/checkout.py
       shell: cmd
 

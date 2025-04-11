@@ -7,6 +7,7 @@ REPOSITORY = os.getenv("INPUT_REPOSITORY")
 REF = os.getenv("INPUT_REF")
 TOKEN = os.getenv("INPUT_TOKEN")
 PATH = os.getenv("INPUT_PATH", "")
+LFS = os.getenv("INPUT_LFS", "false").lower() == "true"
 
 assert(REPOSITORY)
 assert(REF)
@@ -85,6 +86,12 @@ def main():
         result = run_subprocess_async(["git", "-C", PATH, "checkout", "FETCH_HEAD"])
         if result != 0:
             raise RuntimeError(f"Failed to checkout reference {REF}: {result}")
+        
+        if LFS:
+            log("CHECKOUT", "Pulling LFS files")
+            result = run_subprocess_async(["git", "-C", PATH, "lfs", "pull"])
+            if result != 0:
+                raise RuntimeError(f"Failed to pull LFS files: {result}")
     except:
         raise
     finally:
