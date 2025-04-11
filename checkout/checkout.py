@@ -6,7 +6,7 @@ from log import *
 REPOSITORY = os.getenv("INPUT_REPOSITORY")
 REF = os.getenv("INPUT_REF")
 TOKEN = os.getenv("INPUT_TOKEN")
-PATH = os.getenv("PATH", "")
+PATH = os.getenv("INPUT_PATH", "")
 
 assert(REPOSITORY)
 assert(REF)
